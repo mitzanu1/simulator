@@ -7,7 +7,7 @@ function aplicaVariatieStandard(valoare) {
 
 // Funcție helper pentru variația critică de +0% până la +100% (doar crește)
 function aplicaVariatieCriticaPozitiva(valoareDeBaza) {
-  const bonusProcent = Math.random();
+  const bonusProcent = Math.random() * 0.5;
   const bonusCalculat = valoareDeBaza * bonusProcent;
   return Math.round(valoareDeBaza + bonusCalculat);
 }
