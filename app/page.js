@@ -91,27 +91,27 @@ export default function Home() {
   const mercenarImplicit = () => ({ ...profileUnitati.rogue });
 
   const [tabara1, setTabara1] = useState([
-    { ...profileUnitati.rogue },
-    { ...profileUnitati.stavesmen },
-    { ...profileUnitati.swordsmen },
-    { ...profileUnitati.wipmen },
-    { ...profileUnitati.axmen },
-    { ...profileUnitati.knifeman },
-    { ...profileUnitati.range },
-    { ...profileUnitati.light_mount },
-    { ...profileUnitati.heavy_mount },
+    // { ...profileUnitati.rogue },
+    // { ...profileUnitati.stavesmen },
+    // { ...profileUnitati.swordsmen },
+    // { ...profileUnitati.wipmen },
+    // { ...profileUnitati.axmen },
+    // { ...profileUnitati.knifeman },
+    // { ...profileUnitati.range },
+    // { ...profileUnitati.light_mount },
+    // { ...profileUnitati.heavy_mount },
   ]);
 
   const [tabara2, setTabara2] = useState([
-    { ...profileUnitati.rogue },
-    { ...profileUnitati.stavesmen },
-    { ...profileUnitati.swordsmen },
-    { ...profileUnitati.wipmen },
-    { ...profileUnitati.axmen },
-    { ...profileUnitati.knifeman },
-    { ...profileUnitati.range },
-    { ...profileUnitati.light_mount },
-    { ...profileUnitati.heavy_mount },
+    // { ...profileUnitati.rogue },
+    // { ...profileUnitati.stavesmen },
+    // { ...profileUnitati.swordsmen },
+    // { ...profileUnitati.wipmen },
+    // { ...profileUnitati.axmen },
+    // { ...profileUnitati.knifeman },
+    // { ...profileUnitati.range },
+    // { ...profileUnitati.light_mount },
+    // { ...profileUnitati.heavy_mount },
   ]);
 
   const [istoricLupta, setIstoricLupta] = useState([]);
@@ -163,7 +163,9 @@ export default function Home() {
   };
 
   const adaugaMercenar = (tabara, tipClasa) => {
-    const nouMercenar = { ...profileUnitati[tipClasa] };
+    const nouMercenar = {
+      ...profileUnitati[tipClasa],
+    };
     if (tabara === 1) {
       setTabara1((prev) => [...prev, nouMercenar]);
     } else {
