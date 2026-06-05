@@ -655,59 +655,63 @@ export default function Home() {
         </div>
       )}
 
-      {/* Terminalul de Log-uri Retro (Dark Mode) */}
+      {/* Terminalul de Log-uri Stilizat, Curățat și Colorat Strategic */}
       {istoricLupta.length > 0 && (
         <div
           style={{
-            background: "#1e1e1e",
-            color: "#f8f8f2",
+            background: "#111827",
+            color: "#f3f4f6",
             padding: "20px",
             borderRadius: "8px",
             maxHeight: "550px",
             overflowY: "auto",
             boxSizing: "border-box",
-            fontFamily: "monospace",
-            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
+            fontFamily: 'monospace, "Courier New"',
+            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.5)",
           }}
         >
           <h3
             style={{
               margin: "0 0 15px 0",
-              borderBottom: "1px solid #444",
+              borderBottom: "1px solid #374151",
               paddingBottom: "5px",
-              color: "#a6e22e",
+              color: "#10b981",
             }}
           >
-            📜 Jurnalul de Luptă Detaliat (ATB Logs):
+            📜 Jurnalul de Luptă Detaliat:
           </h3>
-          {istoricLupta.map((log, index) => (
-            <p
-              key={index}
-              style={{
-                margin: "4px 0",
-                fontSize: "13px",
-                lineHeight: "1.5",
-                fontWeight:
-                  log.tip === "runda" || log.tip === "sistem"
-                    ? "bold"
-                    : "normal",
-                color:
-                  log.tip === "runda"
-                    ? "#66d9ef"
-                    : log.tip === "moarte"
-                      ? "#f92672"
-                      : log.tip === "lovitura"
-                        ? "#f8f8f2"
-                        : log.tip === "ratare"
-                          ? "#75715e"
-                          : log.tip === "critic"
-                            ? "#fd971f"
-                            : "#e6db74",
-              }}
-            >
-              {log.text}
-            </p>
-          ))}
+          {istoricLupta.map((log, index) => {
+            // REGULĂ NOUĂ: Ignorăm complet mesajele de tip acțiune / sistem (cele fără echipă validă 1 sau 2)
+            if (log.echipa !== 1 && log.echipa !== 2) return null;
+
+            // Stabilim ierarhia de culori cerută
+            let culoareText = "#e5e7eb"; // Gri deschis implicit (Echipa 2)
+
+            if (log.tip === "moarte") {
+              culoareText = "#ef4444"; // Roșu aprins suprascrie tot în caz de deces
+            } else if (log.echipa === 1) {
+              culoareText = "#22c55e"; // Verde aprins pentru Echipa 1
+            } else if (log.echipa === 2) {
+              culoareText = "#94a3b8"; // Gri deschis curat pentru Echipa 2
+            }
+
+            return (
+              <p
+                key={index}
+                style={{
+                  margin: "6px 0",
+                  fontSize: "13px",
+                  lineHeight: "1.5",
+                  color: culoareText,
+                  borderBottom: "1px solid #1f2937",
+                  paddingBottom: "4px",
+                  fontWeight: log.tip === "moarte" ? "bold" : "normal",
+                }}
+              >
+                {log.text}
+              </p>
+            );
+          })}
         </div>
       )}
     </div>
