@@ -266,7 +266,7 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
 
   while (luptaActiva) {
     let mercenariVii = mercenari.filter((m) => m.stats.hp > 0);
-    const MAX_TICKS = mercenariVii.length * 10;
+    const MAX_TICKS = mercenariVii.length * 3;
 
     for (let m of mercenari) {
       if (m.stats.hp > 0) m.vitezăTick = aplicaVariatieStandard(m.stats.speed);
