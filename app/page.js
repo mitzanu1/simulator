@@ -3,7 +3,7 @@ import { useState } from "react";
 import { simuleazaLupta } from "./utils";
 
 export default function Home() {
-  // Profilurile unice de atribute pentru toate clasele din joc
+  // Profilurile de bază folosite ca șablon când se dă click pe "Adaugă"
   const profileUnitati = {
     rogue: {
       clasa: "rogue",
@@ -88,44 +88,20 @@ export default function Home() {
     },
   };
 
-  const mercenarImplicit = () => ({ ...profileUnitati.rogue });
+  // Taberele pornesc complet goale, fără placeholders
+  const [tabara1, setTabara1] = useState([]);
+  const [tabara2, setTabara2] = useState([]);
 
-  const [tabara1, setTabara1] = useState([
-    // { ...profileUnitati.rogue },
-    // { ...profileUnitati.stavesmen },
-    // { ...profileUnitati.swordsmen },
-    // { ...profileUnitati.wipmen },
-    // { ...profileUnitati.axmen },
-    // { ...profileUnitati.knifeman },
-    // { ...profileUnitati.range },
-    // { ...profileUnitati.light_mount },
-    // { ...profileUnitati.heavy_mount },
-  ]);
-
-  const [tabara2, setTabara2] = useState([
-    // { ...profileUnitati.rogue },
-    // { ...profileUnitati.stavesmen },
-    // { ...profileUnitati.swordsmen },
-    // { ...profileUnitati.wipmen },
-    // { ...profileUnitati.axmen },
-    // { ...profileUnitati.knifeman },
-    // { ...profileUnitati.range },
-    // { ...profileUnitati.light_mount },
-    // { ...profileUnitati.heavy_mount },
-  ]);
-
+  // Stări pentru rezultatele bătăliei
   const [istoricLupta, setIstoricLupta] = useState([]);
   const [castigator, setCastigator] = useState("");
+  const [statisticiMasa, setStatisticiMasa] = useState(null);
+  const [seSimuleaza, setSeSimuleaza] = useState(false);
 
-  // State-uri temporare pentru câmpurile de text unde se dă Copy/Paste
-  const [textImportT1, setTextImportT1] = useState("");
-  const [textImportT2, setTextImportT2] = useState("");
-
-  // FUNCȚIE RAFINATĂ: Suportă numere negative și ignoră punctele zecimale
+  // Funcție de import: suportă numere negative și ignoră zecimalele
   const importaDinText = (tabara, indexGlobal, textBrut) => {
     if (!textBrut.trim()) return;
 
-    // REGEX NOU: Adaugă "-?" la început pentru a captura opțional semnul minus
     const potriviri = textBrut.match(/-?\d+(?:[.,]\d+)?/g);
 
     if (!potriviri || potriviri.length < 6) {
@@ -135,14 +111,10 @@ export default function Home() {
       return;
     }
 
-    // Am eliminat Math.max(0, ...) pentru a permite valorilor să fie negative în state
     const [hp, damage, defence, accuracy, agility, speed] = potriviri.map(
-      (num) => {
-        return parseInt(num, 10); // Păstrează semnul "-" și oprește citirea la punct/virgulă
-      },
+      (num) => parseInt(num, 10),
     );
 
-    // Actualizăm starea mercenarului selectat
     if (tabara === 1) {
       setTabara1((prev) =>
         prev.map((m, idx) =>
@@ -162,10 +134,9 @@ export default function Home() {
     }
   };
 
+  // Adaugă un mercenar nou pe o anumită linie tactică
   const adaugaMercenar = (tabara, tipClasa) => {
-    const nouMercenar = {
-      ...profileUnitati[tipClasa],
-    };
+    const nouMercenar = { ...profileUnitati[tipClasa] };
     if (tabara === 1) {
       setTabara1((prev) => [...prev, nouMercenar]);
     } else {
@@ -173,6 +144,7 @@ export default function Home() {
     }
   };
 
+  // Șterge un mercenar specific dintr-o tabără
   const eliminaMercenar = (tabara, indexGlobal) => {
     if (tabara === 1) {
       setTabara1((prev) => prev.filter((_, idx) => idx !== indexGlobal));
@@ -181,11 +153,9 @@ export default function Home() {
     }
   };
 
-  // Permite introducerea manuală a numerelor negative în căsuțele de input
+  // Editează o valoare manuală (permite numere negative)
   const schimbaAtribut = (tabara, indexGlobal, atribut, valoare) => {
-    // Am eliminat Math.max(0, ...) pentru a nu mai bloca numerele sub zero
     const valoareNumerica = parseInt(valoare, 10) || 0;
-
     if (tabara === 1) {
       setTabara1((prev) =>
         prev.map((m, idx) =>
@@ -201,13 +171,46 @@ export default function Home() {
     }
   };
 
+  // Urmărește o singură luptă detaliată
   const pornesteBatalia = () => {
+    setStatisticiMasa(null);
     const rezultat = simuleazaLupta(tabara1, tabara2);
     setIstoricLupta(rezultat.logs);
     setCastigator(rezultat.castigator);
   };
 
-  // Helper JSX pentru a randa dinamic o linie tactică dintr-o tabără
+  // Rulează 100 de lupte și afișează raportul procentual compact
+  const pornesteSimulareMasa = () => {
+    if (tabara1.length === 0 && tabara2.length === 0) {
+      alert("❌ Ambele armate sunt goale! Adaugă trupe înainte de simulare.");
+      return;
+    }
+
+    setSeSimuleaza(true);
+    setCastigator("");
+    setIstoricLupta([]);
+
+    let victoriiT1 = 0;
+    let victoriiT2 = 0;
+
+    for (let i = 0; i < 100; i++) {
+      const rezultat = simuleazaLupta(tabara1, tabara2);
+      if (rezultat.castigator === "Tabăra 1") {
+        victoriiT1++;
+      } else if (rezultat.castigator === "Tabăra 2") {
+        victoriiT2++;
+      }
+    }
+
+    setStatisticiMasa({
+      procentT1: victoriiT1,
+      procentT2: victoriiT2,
+    });
+
+    setSeSimuleaza(false);
+  };
+
+  // Componentă helper internă (mutată corect în corpul principal pentru a moșteni starea din React)
   const RandeazaLinieTactica = ({
     numarTabara,
     tipClasa,
@@ -215,8 +218,6 @@ export default function Home() {
     culoareAccent,
     numeAfisat,
   }) => {
-    // Filtrăm elementele care aparțin exclusiv acestei linii/clase
-    // Păstrăm indexul original global pentru a putea edita corect starea din React
     const mercenariLinie = listaCompleta
       .map((m, idx) => ({ ...m, indexGlobal: idx }))
       .filter((m) => m.clasa === tipClasa);
@@ -324,7 +325,6 @@ export default function Home() {
                   </button>
                 </div>
 
-                {/* CASSETĂ IMPORT RAPID: Utilizatorul dă Paste la un text cu cele 6 numere aici */}
                 <div
                   style={{
                     marginBottom: "8px",
@@ -339,7 +339,6 @@ export default function Home() {
                     type="text"
                     placeholder="Paste text brut (ex: 150 30 15 25 20 12)..."
                     onPaste={(e) => {
-                      // Preluăm textul copiat direct din evenimentul de Paste
                       const textLipit = e.clipboardData.getData("text");
                       importaDinText(
                         numarTabara,
@@ -434,6 +433,98 @@ export default function Home() {
         la un șir de 6 numere (HP, DMG, DEF, ACC, AGI, SPD) [INDEX].
       </p>
 
+      {/* Panou Vizual Simplificat: Echipa 1 vs Echipa 2 */}
+      {statisticiMasa && (
+        <div
+          style={{
+            background: "#f0fdf4",
+            border: "1px solid #bbf7d0",
+            padding: "20px",
+            borderRadius: "8px",
+            marginBottom: "25px",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              marginTop: 0,
+              color: "#166534",
+              borderBottom: "2px solid #bbf7d0",
+              paddingBottom: "8px",
+            }}
+          >
+            📊 Raport Procentual de Câștig (100 de Simulări)
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "15px",
+              marginTop: "15px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                background: "#fff",
+                padding: "12px",
+                borderRadius: "6px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                }}
+              >
+                Rată Victorie Echipa 1
+              </span>
+              <h3
+                style={{
+                  fontSize: "28px",
+                  margin: "5px 0 0 0",
+                  color: "#2563eb",
+                }}
+              >
+                {statisticiMasa.procentT1}%
+              </h3>
+            </div>
+            <div
+              style={{
+                background: "#fff",
+                padding: "12px",
+                borderRadius: "6px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                }}
+              >
+                Rată Victorie Echipa 2
+              </span>
+              <h3
+                style={{
+                  fontSize: "28px",
+                  margin: "5px 0 0 0",
+                  color: "#dc2626",
+                }}
+              >
+                {statisticiMasa.procentT2}%
+              </h3>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Secțiunea Principală de Configurare Armate */}
       <div
         style={{
@@ -443,7 +534,7 @@ export default function Home() {
           marginBottom: "25px",
         }}
       >
-        {/* Panel Armata 1 (Alianța) */}
+        {/* Panel Armata 1 (Echipa 1) */}
         <div
           style={{
             flex: 1,
@@ -463,7 +554,7 @@ export default function Home() {
               marginBottom: "15px",
             }}
           >
-            🛡️ Alianța - Tabăra 1 ({tabara1.length})
+            🛡️ Echipa 1 ({tabara1.length})
           </h3>
           <RandeazaLinieTactica
             numarTabara={1}
@@ -530,7 +621,7 @@ export default function Home() {
           />
         </div>
 
-        {/* Panel Armata 2 (Hoarda) */}
+        {/* Panel Armata 2 (Echipa 2) */}
         <div
           style={{
             flex: 1,
@@ -550,7 +641,7 @@ export default function Home() {
               marginBottom: "15px",
             }}
           >
-            🔺 Hoarda - Tabăra 2 ({tabara2.length})
+            🔺 Echipa 2 ({tabara2.length})
           </h3>
           <RandeazaLinieTactica
             numarTabara={2}
@@ -618,13 +709,20 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Zona Buton Central de Declanșare */}
-      <div style={{ textAlign: "center", marginBottom: "25px" }}>
+      {/* Zona Butoane Centrale de Acțiune */}
+      <div
+        style={{
+          display: "flex",
+          gap: "15px",
+          justifyContent: "center",
+          marginBottom: "25px",
+        }}
+      >
         <button
           onClick={pornesteBatalia}
           style={{
-            padding: "14px 45px",
-            fontSize: "18px",
+            padding: "14px 30px",
+            fontSize: "16px",
             fontWeight: "bold",
             cursor: "pointer",
             backgroundColor: "#059669",
@@ -632,14 +730,32 @@ export default function Home() {
             border: "none",
             borderRadius: "6px",
             boxShadow: "0 4px 6px rgba(5, 150, 105, 0.2)",
-            transition: "all 0.2s",
           }}
         >
-          ⚔️ LANSEAZĂ SIMULAREA ATB MULTI-CICLU
+          ⚔️ URMĂREȘTE O LUPTĂ (DETALIAT)
+        </button>
+
+        <button
+          onClick={pornesteSimulareMasa}
+          disabled={seSimuleaza}
+          style={{
+            padding: "14px 30px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            backgroundColor: "#3b82f6",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            boxShadow: "0 4px 6px rgba(59, 130, 246, 0.2)",
+            opacity: seSimuleaza ? 0.6 : 1,
+          }}
+        >
+          {seSimuleaza ? "⏳ Se calculează..." : "📊 SIMULEAZĂ 100 DE LUPTE"}
         </button>
       </div>
 
-      {/* Rezultat Final Banner */}
+      {/* Banner Câștigător Unic */}
       {castigator && (
         <div
           style={{
@@ -683,18 +799,16 @@ export default function Home() {
             📜 Jurnalul de Luptă Detaliat:
           </h3>
           {istoricLupta.map((log, index) => {
-            // REGULĂ NOUĂ: Ignorăm complet mesajele de tip acțiune / sistem (cele fără echipă validă 1 sau 2)
             if (log.echipa !== 1 && log.echipa !== 2) return null;
 
-            // Stabilim ierarhia de culori cerută
-            let culoareText = "#e5e7eb"; // Gri deschis implicit (Echipa 2)
+            let culoareText = "#e5e7eb";
 
             if (log.tip === "moarte") {
-              culoareText = "#ef4444"; // Roșu aprins suprascrie tot în caz de deces
+              culoareText = "#ef4444";
             } else if (log.echipa === 1) {
-              culoareText = "#22c55e"; // Verde aprins pentru Echipa 1
+              culoareText = "#22c55e";
             } else if (log.echipa === 2) {
-              culoareText = "#94a3b8"; // Gri deschis curat pentru Echipa 2
+              culoareText = "#94a3b8";
             }
 
             return (
