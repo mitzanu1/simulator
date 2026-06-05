@@ -330,7 +330,7 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
           let raportCrit = acurateteAtacant / agilitateSigura;
 
           if (raportCrit >= 5) sansaCritic = 100;
-          else if (raportCrit >= 2) sansaCritic = 15 + (raportCrit - 2) * 35;
+          else if (raportCrit >= 2) sansaCritic = (raportCrit - 2) * 50;
 
           if (sansaCritic > 0 && Math.random() * 100 <= sansaCritic)
             esteCritic = true;
