@@ -348,7 +348,7 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
 
             logs.push({
               echipa: atacatorCurent.echipa,
-              text: `⚔️ [C${numarCiclu}-T${tick}] ${atacatorCurent.nume} dă o 🔥 LOVITURĂ CRITICĂ în ${tintaCompleta.nume} pentru 💥 ${damageFinal} damage! (HP rămas: ${tintaCompleta.stats.hp})`,
+              text: `⚔️[CRIT] ${atacatorCurent.nume} dă o 🔥 LOVITURĂ CRITICĂ(${acurateteAtacant},${agilitateSigura},${sansaCritic}%) în ${tintaCompleta.nume} pentru 💥 ${damageFinal} damage! (HP rămas: ${tintaCompleta.stats.hp})`,
             });
           } else {
             let damageAtacantNormal = aplicaVariatieStandard(
@@ -362,10 +362,9 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
               0,
               tintaCompleta.stats.hp - damageFinal,
             );
-
             logs.push({
               echipa: atacatorCurent.echipa,
-              text: `⚔️ [C${numarCiclu}-T${tick}] ${atacatorCurent.nume} lovește pe ${tintaCompleta.nume} pentru 💥 ${damageFinal} damage. (HP rămas: ${tintaCompleta.stats.hp})`,
+              text: `⚔️ ${atacatorCurent.nume} lovește(acc:${acurateteAtacant},agi:${agilitateTinta}) pe ${tintaCompleta.nume} pentru 💥 ${damageFinal}(dmg:${damageAtacantNormal},def:${aparareTintaNormal}) damage. (HP rămas: ${tintaCompleta.stats.hp})`,
             });
           }
 
@@ -385,17 +384,17 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
           ) {
             logs.push({
               echipa: atacatorCurent.echipa,
-              text: `🏹 [C${numarCiclu}-T${tick}] ${atacatorCurent.nume} trage spre ${tintaCompleta.nume} dar 💨 RATEAZĂ (distanță sigură, fără ripostă).`,
+              text: `🏹 [Miss]${atacatorCurent.nume} trage(acc:${acurateteAtacant},agi:${agilitateTinta}) spre ${tintaCompleta.nume} dar 💨 RATEAZĂ (distanță sigură, fără ripostă).`,
             });
           } else {
-            let aDouaAcurateteAtacant = aplicaVariatieStandard(
-              bazeModificate.accA,
-            );
-            let aDouaAgilitateTinta = aplicaVariatieStandard(
-              bazeModificate.agiT,
-            );
+            // let aDouaAcurateteAtacant = aplicaVariatieStandard(
+            //   bazeModificate.accA,
+            // );
+            // let aDouaAgilitateTinta = aplicaVariatieStandard(
+            //   bazeModificate.agiT,
+            // );
 
-            if (aDouaAcurateteAtacant <= aDouaAgilitateTinta) {
+            if (Math.random * 100 < 33) {
               let damageContratac = aplicaVariatieStandard(bazeModificate.dmgT);
               let aparareAtacant = aplicaVariatieStandard(bazeModificate.defA);
               let apararePenetrata = Math.round(aparareAtacant * 0.5);
@@ -411,7 +410,7 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
 
               logs.push({
                 echipa: tintaCompleta.echipa,
-                text: `💨 [C${numarCiclu}-T${tick}] ${atacatorCurent.nume} ratează atacul asupra ${tintaCompleta.nume} și încasează un ⚡ CONTRATAC devastator de 💥 ${damageFinalContratac} damage! (HP rămas agresor: ${atacatorCurent.stats.hp})`,
+                text: `💨 [Counter] ${atacatorCurent.nume} ratează atacul(acc:${acurateteAtacant},agi:${agilitateTinta}) asupra ${tintaCompleta.nume} și încasează un ⚡ CONTRATAC devastator de 💥 ${damageFinalContratac} damage! (HP rămas agresor: ${atacatorCurent.stats.hp})`,
               });
 
               if (atacatorCurent.stats.hp <= 0) {
@@ -424,7 +423,7 @@ export function simuleazaLupta(tabara1Original, tabara2Original) {
             } else {
               logs.push({
                 echipa: atacatorCurent.echipa,
-                text: `💨 [C${numarCiclu}-T${tick}] ${atacatorCurent.nume} ratează atacul asupra ${tintaCompleta.nume}, dar se repliază rapid fără să primească ripostă.`,
+                text: `💨 [Miss] ${atacatorCurent.nume} ratează atacul(acc:${acurateteAtacant},agi:${agilitateTinta}) asupra ${tintaCompleta.nume}, dar se repliază rapid fără să primească ripostă.`,
               });
             }
           }
