@@ -112,7 +112,10 @@ export default function Home() {
     }
 
     const [hp, damage, defence, accuracy, agility, speed] = potriviri.map(
-      (num) => parseInt(num, 10),
+      (num) => {
+        if (num <= 0) num = 1;
+        return parseInt(num, 10);
+      },
     );
 
     if (tabara === 1) {
